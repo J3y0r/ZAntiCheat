@@ -1,0 +1,13 @@
+package cn.jeyor1337.zanticheat.util.hook.plugin.simplehook;
+
+import cn.jeyor1337.zanticheat.util.hook.plugin.HookUtil;
+
+public class ValhallaMMOHook extends HookUtil {
+
+    private static final String PLUGIN_NAME = "ValhallaMMO";
+
+    public static boolean isPluginInstalled() {
+        return isPlugin(PLUGIN_NAME);
+    }
+
+}

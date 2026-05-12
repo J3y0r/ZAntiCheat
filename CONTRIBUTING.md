@@ -1,6 +1,6 @@
-# Contributing to LightAntiCheat
+# Contributing to ZAntiCheat
 
-LightAntiCheat is happy that you want to contribute to the project! We are always looking for new contributors to help us improve the project. We have a few guidelines that we ask you to follow when contributing to the project.
+ZAntiCheat is happy that you want to contribute to the project! We are always looking for new contributors to help us improve the project. We have a few guidelines that we ask you to follow when contributing to the project.
 
 
 

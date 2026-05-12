@@ -4,8 +4,8 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'me.vekster'
-version = '1.2.7'
+group = 'cn.jeyor1337'
+version = '0.0.3'
 
 repositories {
     mavenCentral()
@@ -27,6 +27,12 @@ dependencies {
     compileOnly files('comp/spigot-1.8.8-R0.1-SNAPSHOT-latest.jar')
     // Netty
     compileOnly 'io.netty:netty-all:4.2.3.Final'
+    // MySQL JDBC
+    implementation 'com.mysql:mysql-connector-j:8.0.33'
+    implementation 'cglib:cglib:3.3.0'
+    implementation 'com.mchange:c3p0:0.9.5.5'
+    // Redis message bridge
+    implementation 'redis.clients:jedis:4.4.8'
     // LightInjector
     implementation files('impl/LightInjector-1.0.2-forked.jar')
     // FoliaLib
@@ -34,7 +40,7 @@ dependencies {
     // Floodgate
     compileOnly 'org.geysermc.floodgate:api:2.2.3-SNAPSHOT'
     // Config Updater
-    implementation 'com.tchristofferson:ConfigUpdater:2.1-SNAPSHOT'
+    implementation 'com.tchristofferson:ConfigUpdater:2.2'
     // MultiVersion
     implementation fileTree('impl/multiversion')
 }
@@ -49,7 +55,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/tiredvekster/LightAntiCheat"
+            url = "https://maven.pkg.github.com/tiredvekster/ZAntiCheat"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")

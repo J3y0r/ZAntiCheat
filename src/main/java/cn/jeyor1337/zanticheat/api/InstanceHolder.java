@@ -2,13 +2,13 @@ package cn.jeyor1337.zanticheat.api;
 
 public class InstanceHolder {
 
-    private static LACApi api;
+    private static ZACApi api;
 
-    public static void setApi(LACApi api) {
+    public static void setApi(ZACApi api) {
         InstanceHolder.api = api;
     }
 
-    public static LACApi getApi() {
+    public static ZACApi getApi() {
         return api;
     }
 

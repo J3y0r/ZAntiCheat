@@ -2,12 +2,12 @@ package cn.jeyor1337.zanticheat.util.api;
 
 import cn.jeyor1337.zanticheat.api.CheckType;
 import cn.jeyor1337.zanticheat.api.DetectionStatus;
-import cn.jeyor1337.zanticheat.api.LACApi;
+import cn.jeyor1337.zanticheat.api.ZACApi;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public class ApiInstance implements LACApi {
+public class ApiInstance implements ZACApi {
     @Override
     public Set<String> getCheckNames(CheckType checkType) {
         return ApiUtil.getCheckNames(checkType);

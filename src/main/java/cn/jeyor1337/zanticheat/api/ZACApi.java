@@ -4,8 +4,8 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public interface LACApi {
-    static LACApi getInstance() {
+public interface ZACApi {
+    static ZACApi getInstance() {
         return InstanceHolder.getApi();
     }
 

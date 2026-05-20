@@ -130,18 +130,24 @@ public class SpeedC extends MovementCheck implements Listener {
                 maxSpeed *= 1.35;
         }
 
+        boolean isBedrockPlayer = FloodgateHook.isBedrockPlayer(player, true);
+        boolean isPocketPlayer = FloodgateHook.isProbablyPocketEditionPlayer(player, true);
+
         double targetSpeed = ScalaredMath.scaleVal(speed, 2);
         double finalSpeedLimit = ScalaredMath.scaleVal(
                 MoveEngine.getSpeedByTick(buffer.getInt("localAirTicker")) * maxSpeed + 0.01, 2);
 
-        if (FloodgateHook.isProbablyPocketEditionPlayer(player, true))
-            targetSpeed *= 0.85;
+        if (isBedrockPlayer)
+            finalSpeedLimit = finalSpeedLimit * (isPocketPlayer ? 1.35 : 1.2) + (isPocketPlayer ? 0.08 : 0.04);
 
         Map<String, Double> attributes = getPlayerAttributes(player);
         if (getItemStackAttributes(player, "GENERIC_MOVEMENT_SPEED", "PLAYER_SNEAKING_SPEED") != 0 ||
                 attributes.getOrDefault("GENERIC_MOVEMENT_SPEED", 0.13) > 0.14 ||
                 attributes.getOrDefault("PLAYER_SNEAKING_SPEED", 0.0) > 0.1)
             return;
+
+        int reportThreshold = isBedrockPlayer ? (isPocketPlayer ? 43 : 40) : 30;
+        int requiredFlags = isBedrockPlayer ? (isPocketPlayer ? 6 : 5) : 3;
 
         if (targetSpeed < finalSpeedLimit) {
             if (buffer.getInt("localPlayerRaport") <= 0) return;
@@ -151,12 +157,11 @@ public class SpeedC extends MovementCheck implements Listener {
             buffer.put("localPlayerRaport", buffer.getInt("localPlayerRaport") + 3);
         }
 
-        if (buffer.getInt("localPlayerRaport") <= 30) return;
-
+        if (buffer.getInt("localPlayerRaport") <= reportThreshold) return;
 
         buffer.put("flags", buffer.getInt("flags") + 1);
-        if (buffer.getInt("flags") <= 2 && currentTime - zacPlayer.cache.lastEntityNearby > 1000 ||
-                buffer.getInt("flags") <= 3)
+        if (buffer.getInt("flags") <= requiredFlags - 1 && currentTime - zacPlayer.cache.lastEntityNearby > 1000 ||
+                buffer.getInt("flags") <= requiredFlags)
             return;
 
         Set<Player> players = getPlayersForEnchantsSquared(zacPlayer, player);

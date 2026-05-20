@@ -1,8 +1,8 @@
-# LightAntiCheat
+# ZAntiCheat
 
-LightAntiCheat 是一个面向 Bukkit / Spigot / Paper / Folia 服务端的轻量级反作弊插件，核心目标是用较低的运行成本检测常见作弊行为，并为服务器管理员提供可配置、可扩展的处罚与告警流程。
+ZAntiCheat 是一个面向 Bukkit / Spigot / Paper / Folia 服务端的轻量级反作弊插件，核心目标是用较低的运行成本检测常见作弊行为，并为服务器管理员提供可配置、可扩展的处罚与告警流程。
 
-项目基于 ZAntiCheat 代码体系维护，主插件名仍为 `ZAntiCheat`，入口类为 `cn.jeyor1337.zanticheat.Main`。
+插件入口类为 `cn.jeyor1337.zanticheat.Main`。
 
 ## 特性
 

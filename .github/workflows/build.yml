@@ -5,7 +5,9 @@
 # https://github.com/FabricMC/fabric-example-mod/blob/1.21/.github/workflows/build.yml
 
 name: build
-on: [pull_request, push]
+
+on:
+  pull_request:
 
 jobs:
   build:

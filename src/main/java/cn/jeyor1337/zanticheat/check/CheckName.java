@@ -39,6 +39,7 @@ public enum CheckName {
     AUTOCLICKER_A(CheckType.COMBAT, "AutoClicker_A", "Pattern"),
     AUTOCLICKER_B(CheckType.COMBAT, "AutoClicker_B", "Impossible"),
     AUTOCLICKER_C(CheckType.COMBAT, "AutoClicker_C", "Heuristic"),
+    AUTOCLICKER_D(CheckType.COMBAT, "AutoClicker_D", "Rhythm"),
     VELOCITY_A(CheckType.COMBAT, "Velocity_A", "AntiKnockback"),
     AIRPZACE_A(CheckType.INTERACTION, "AirPlace_A", "AirPlaceA"),
     FASTPZACE_A(CheckType.INTERACTION, "FastPlace_A", "FastPlaceA"),

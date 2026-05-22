@@ -384,6 +384,28 @@ public class ConfigManager extends PlaceholderConvertor {
         checkSetting.autoClickerCFlagVl = 12;
         checkSetting.autoClickerCFlagCooldown = 2500L;
         checkSetting.autoClickerCIgnoreLowConnectionStability = true;
+        checkSetting.autoClickerDWindowSize = 60;
+        checkSetting.autoClickerDMinSamples = 48;
+        checkSetting.autoClickerDAnalysisStep = 12;
+        checkSetting.autoClickerDMinInterval = 20L;
+        checkSetting.autoClickerDMaxInterval = 240L;
+        checkSetting.autoClickerDMaxAverageInterval = 175L;
+        checkSetting.autoClickerDBucketSizeMs = 2L;
+        checkSetting.autoClickerDStableDelta = 4L;
+        checkSetting.autoClickerDCvThreshold = 0.16;
+        checkSetting.autoClickerDMadRatioThreshold = 0.11;
+        checkSetting.autoClickerDEntropyThreshold = 2.75;
+        checkSetting.autoClickerDTop3RatioThreshold = 0.72;
+        checkSetting.autoClickerDPatternRatioThreshold = 0.42;
+        checkSetting.autoClickerDStableSliceThreshold = 0.045;
+        checkSetting.autoClickerDLongGapRatioThreshold = 0.04;
+        checkSetting.autoClickerDScoreThreshold = 0.68;
+        checkSetting.autoClickerDRequiredWindows = 3;
+        checkSetting.autoClickerDVlAdd = 5;
+        checkSetting.autoClickerDVlDecay = 2;
+        checkSetting.autoClickerDFlagVl = 12;
+        checkSetting.autoClickerDFlagCooldown = 3500L;
+        checkSetting.autoClickerDIgnoreLowConnectionStability = true;
 
         if (checkName == CheckName.KILLAURA_E) {
             checkSetting.killAuraECombatWindow = section.getLong("detection.combat-window", checkSetting.killAuraECombatWindow);
@@ -437,6 +459,31 @@ public class ConfigManager extends PlaceholderConvertor {
             checkSetting.autoClickerCFlagVl = section.getInt("detection.flag-vl", checkSetting.autoClickerCFlagVl);
             checkSetting.autoClickerCFlagCooldown = section.getLong("detection.flag-cooldown", checkSetting.autoClickerCFlagCooldown);
             checkSetting.autoClickerCIgnoreLowConnectionStability = section.getBoolean("detection.ignore-low-connection-stability", checkSetting.autoClickerCIgnoreLowConnectionStability);
+        }
+
+        if (checkName == CheckName.AUTOCLICKER_D) {
+            checkSetting.autoClickerDWindowSize = section.getInt("detection.window-size", checkSetting.autoClickerDWindowSize);
+            checkSetting.autoClickerDMinSamples = section.getInt("detection.min-samples", checkSetting.autoClickerDMinSamples);
+            checkSetting.autoClickerDAnalysisStep = section.getInt("detection.analysis-step", checkSetting.autoClickerDAnalysisStep);
+            checkSetting.autoClickerDMinInterval = section.getLong("detection.min-interval", checkSetting.autoClickerDMinInterval);
+            checkSetting.autoClickerDMaxInterval = section.getLong("detection.max-interval", checkSetting.autoClickerDMaxInterval);
+            checkSetting.autoClickerDMaxAverageInterval = section.getLong("detection.max-average-interval", checkSetting.autoClickerDMaxAverageInterval);
+            checkSetting.autoClickerDBucketSizeMs = section.getLong("detection.bucket-size-ms", checkSetting.autoClickerDBucketSizeMs);
+            checkSetting.autoClickerDStableDelta = section.getLong("detection.stable-delta", checkSetting.autoClickerDStableDelta);
+            checkSetting.autoClickerDCvThreshold = section.getDouble("detection.cv-threshold", checkSetting.autoClickerDCvThreshold);
+            checkSetting.autoClickerDMadRatioThreshold = section.getDouble("detection.mad-ratio-threshold", checkSetting.autoClickerDMadRatioThreshold);
+            checkSetting.autoClickerDEntropyThreshold = section.getDouble("detection.entropy-threshold", checkSetting.autoClickerDEntropyThreshold);
+            checkSetting.autoClickerDTop3RatioThreshold = section.getDouble("detection.top3-ratio-threshold", checkSetting.autoClickerDTop3RatioThreshold);
+            checkSetting.autoClickerDPatternRatioThreshold = section.getDouble("detection.pattern-ratio-threshold", checkSetting.autoClickerDPatternRatioThreshold);
+            checkSetting.autoClickerDStableSliceThreshold = section.getDouble("detection.stable-slice-threshold", checkSetting.autoClickerDStableSliceThreshold);
+            checkSetting.autoClickerDLongGapRatioThreshold = section.getDouble("detection.long-gap-ratio-threshold", checkSetting.autoClickerDLongGapRatioThreshold);
+            checkSetting.autoClickerDScoreThreshold = section.getDouble("detection.score-threshold", checkSetting.autoClickerDScoreThreshold);
+            checkSetting.autoClickerDRequiredWindows = section.getInt("detection.required-windows", checkSetting.autoClickerDRequiredWindows);
+            checkSetting.autoClickerDVlAdd = section.getInt("detection.vl-add", checkSetting.autoClickerDVlAdd);
+            checkSetting.autoClickerDVlDecay = section.getInt("detection.vl-decay", checkSetting.autoClickerDVlDecay);
+            checkSetting.autoClickerDFlagVl = section.getInt("detection.flag-vl", checkSetting.autoClickerDFlagVl);
+            checkSetting.autoClickerDFlagCooldown = section.getLong("detection.flag-cooldown", checkSetting.autoClickerDFlagCooldown);
+            checkSetting.autoClickerDIgnoreLowConnectionStability = section.getBoolean("detection.ignore-low-connection-stability", checkSetting.autoClickerDIgnoreLowConnectionStability);
         }
 
         return checkSetting;

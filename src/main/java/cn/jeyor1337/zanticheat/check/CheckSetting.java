@@ -64,5 +64,27 @@ public class CheckSetting {
     public int autoClickerCFlagVl;
     public long autoClickerCFlagCooldown;
     public boolean autoClickerCIgnoreLowConnectionStability;
+    public int autoClickerDWindowSize;
+    public int autoClickerDMinSamples;
+    public int autoClickerDAnalysisStep;
+    public long autoClickerDMinInterval;
+    public long autoClickerDMaxInterval;
+    public long autoClickerDMaxAverageInterval;
+    public long autoClickerDBucketSizeMs;
+    public long autoClickerDStableDelta;
+    public double autoClickerDCvThreshold;
+    public double autoClickerDMadRatioThreshold;
+    public double autoClickerDEntropyThreshold;
+    public double autoClickerDTop3RatioThreshold;
+    public double autoClickerDPatternRatioThreshold;
+    public double autoClickerDStableSliceThreshold;
+    public double autoClickerDLongGapRatioThreshold;
+    public double autoClickerDScoreThreshold;
+    public int autoClickerDRequiredWindows;
+    public int autoClickerDVlAdd;
+    public int autoClickerDVlDecay;
+    public int autoClickerDFlagVl;
+    public long autoClickerDFlagCooldown;
+    public boolean autoClickerDIgnoreLowConnectionStability;
 
 }

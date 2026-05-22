@@ -1608,6 +1608,79 @@ checks:
           flag-cooldown: 2500
           # 连接稳定性较低时是否跳过该检测。
           ignore-low-connection-stability: true
+      # autoclicker_d 子检测项配置。
+      autoclicker_d:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 4
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% %check%"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 3
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 5.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 10000
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+          # AutoClicker 节奏分析样本窗口大小。
+          window-size: 60
+          # 启用节奏分析前需要的最少样本数。
+          min-samples: 48
+          # 每累计多少个新样本执行一次窗口分析。
+          analysis-step: 12
+          # 纳入 AutoClicker 节奏统计的最小点击间隔，单位为毫秒。
+          min-interval: 20
+          # 纳入 AutoClicker 节奏统计的最大点击间隔，单位为毫秒。
+          max-interval: 240
+          # 可疑节奏的最大平均点击间隔，单位为毫秒。
+          max-average-interval: 175
+          # 点击间隔分桶统计的桶大小，单位为毫秒。
+          bucket-size-ms: 2
+          # 相邻点击间隔差低于该值时视为稳定间隔，单位为毫秒。
+          stable-delta: 4
+          # 点击间隔变异系数低于该阈值时更可疑。
+          cv-threshold: 0.16
+          # 点击间隔中位绝对偏差比例低于该阈值时更可疑。
+          mad-ratio-threshold: 0.11
+          # 点击间隔熵低于该阈值时更可疑。
+          entropy-threshold: 2.75
+          # 前三高频间隔占比高于该阈值时更可疑。
+          top3-ratio-threshold: 0.72
+          # 连续或隔位间隔模式占比高于该阈值时更可疑。
+          pattern-ratio-threshold: 0.42
+          # 分段平均间隔偏移低于该阈值时更可疑。
+          stable-slice-threshold: 0.045
+          # 长间隔占比低于该阈值时更可疑。
+          long-gap-ratio-threshold: 0.04
+          # 单个统计窗口判定可疑的最低分数。
+          score-threshold: 0.68
+          # 触发违规前需要累计的可疑窗口数量。
+          required-windows: 3
+          # AutoClicker 内部违规分每次命中增加值。
+          vl-add: 5
+          # AutoClicker 内部违规分每次衰减值。
+          vl-decay: 2
+          # AutoClicker 内部违规分达到该值时触发违规。
+          flag-vl: 12
+          # 该检测连续报点之间的最小间隔，单位为毫秒。
+          flag-cooldown: 3500
+          # 连接稳定性较低时是否跳过该检测。
+          ignore-low-connection-stability: true
     # 击退异常检测组。
     velocity:
       # velocity_a 子检测项配置。

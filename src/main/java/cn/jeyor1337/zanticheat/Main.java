@@ -5,6 +5,7 @@ import cn.jeyor1337.zanticheat.check.buffer.Buffer;
 import cn.jeyor1337.zanticheat.check.checks.combat.autoclicker.AutoClickerA;
 import cn.jeyor1337.zanticheat.check.checks.combat.autoclicker.AutoClickerB;
 import cn.jeyor1337.zanticheat.check.checks.combat.autoclicker.AutoClickerC;
+import cn.jeyor1337.zanticheat.check.checks.combat.autoclicker.AutoClickerD;
 import cn.jeyor1337.zanticheat.check.checks.combat.criticals.CriticalsA;
 import cn.jeyor1337.zanticheat.check.checks.combat.criticals.CriticalsB;
 import cn.jeyor1337.zanticheat.check.checks.combat.fakelag.FakeLagA;
@@ -174,6 +175,7 @@ public class Main extends JavaPlugin {
         registerCheckListener(new AutoClickerA());
         registerCheckListener(new AutoClickerB());
         registerCheckListener(new AutoClickerC());
+        registerCheckListener(new AutoClickerD());
         registerCheckListener(new VelocityA());
         registerCheckListener(new AirPlaceA());
         registerCheckListener(new FastPlaceA());

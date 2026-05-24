@@ -14,7 +14,7 @@ repositories {
     // Floodgate
     maven { url 'https://repo.opencollab.dev/main/' }
     // FoliaLib
-    maven { url 'https://nexuslite.gcnt.net/repos/other/' }
+    maven { url 'https://repo.nexomc.com/releases/' }
 }
 
 dependencies {
@@ -36,7 +36,7 @@ dependencies {
     // LightInjector
     implementation files('impl/LightInjector-1.0.2-forked.jar')
     // FoliaLib
-    implementation 'com.tcoded:FoliaLib:0.4.2'
+    implementation 'com.tcoded:FoliaLib:0.4.3'
     // Floodgate
     compileOnly 'org.geysermc.floodgate:api:2.2.3-SNAPSHOT'
     // Config Updater
@@ -46,9 +46,8 @@ dependencies {
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
-    }
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 publishing {
@@ -73,6 +72,7 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.release.set(8)
 }
 
 processResources {

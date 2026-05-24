@@ -33,6 +33,10 @@ public class KillAuraB extends CombatCheck implements Listener {
     public void onAsyncHit(ZACAsyncPlayerAttackEvent event) {
         ZACPlayer zacPlayer = event.getZacPlayer();
         Player player = event.getPlayer();
+
+        if (FloodgateHook.isProbablyPocketEditionPlayer(player, true))
+            return;
+
         Location eyeLocation = player.getEyeLocation().clone();
         double yawChange = getYawChange(eyeLocation, zacPlayer);
 
@@ -69,6 +73,8 @@ public class KillAuraB extends CombatCheck implements Listener {
 
         if (distanceToHitbox(player, entity) != -1)
             return;
+
+        boolean bedrockPlayer = FloodgateHook.isBedrockPlayer(player, true);
 
         Location entityLocation = entity.getLocation();
         double entityHalfWidth = VerUtil.getWidth(entity) / 2.0;
@@ -117,10 +123,10 @@ public class KillAuraB extends CombatCheck implements Listener {
         if (distanceHorizontal(eventHistory.get(HistoryElement.FIRST), eventHistory.get(HistoryElement.FROM)) >
                 (0.21585 + 0.28061) / 2)
             maxAngle += 25;
-        if (FloodgateHook.isProbablyPocketEditionPlayer(player, true))
-            maxAngle += 15;
-        if (FloodgateHook.isBedrockPlayer(player))
-            maxAngle += 15;
+        if (bedrockPlayer) {
+            maxAngle += 25;
+            extraOffset += 5.0;
+        }
 
         double yawChange1 = getYawChange(eyeLocation, zacPlayer);
         float finalAngle = angle;

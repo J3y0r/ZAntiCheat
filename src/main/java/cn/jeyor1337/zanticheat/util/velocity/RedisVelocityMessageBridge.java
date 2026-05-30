@@ -121,17 +121,20 @@ public class RedisVelocityMessageBridge implements VelocityMessageBridge, Closea
                 + sanitize(message.playerName) + "|"
                 + sanitize(message.uuid) + "|"
                 + sanitize(message.checkName) + "|"
+                + sanitize(message.command) + "|"
                 + message.timestamp;
     }
 
     private VelocityBanSyncMessage deserialize(String raw) {
         String[] parts = raw.split("\\|", -1);
-        if (parts.length != 5) {
+        if (parts.length != 5 && parts.length != 6) {
             Logger.logConsole(LogType.WARN, "(" + Main.getInstance().getName() + ") Ignored malformed velocity sync message");
             return null;
         }
         try {
-            return new VelocityBanSyncMessage(parts[0], parts[1], parts[2], parts[3], Long.parseLong(parts[4]));
+            if (parts.length == 5)
+                return new VelocityBanSyncMessage(parts[0], parts[1], parts[2], parts[3], Long.parseLong(parts[4]));
+            return new VelocityBanSyncMessage(parts[0], parts[1], parts[2], parts[3], parts[4], Long.parseLong(parts[5]));
         } catch (NumberFormatException exception) {
             Logger.logConsole(LogType.WARN, "(" + Main.getInstance().getName() + ") Ignored malformed velocity sync timestamp");
             return null;

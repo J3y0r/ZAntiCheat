@@ -25,6 +25,8 @@ public class BadPacketsC extends PacketCheck implements Listener {
     public void onAsyncPacketReceive(ZACAsyncPacketReceiveEvent event) {
         if (event.getPacketType() != PacketType.STEER_VEHICLE)
             return;
+        if (!"PacketPlayInSteerVehicle".equals(event.getPacketClassName()))
+            return;
 
         Player player = event.getPlayer();
         ZACPlayer zacPlayer = event.getZacPlayer();

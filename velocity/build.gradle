@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+group = rootProject.group
+version = rootProject.version
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+}
+
+dependencies {
+    compileOnly('com.velocitypowered:velocity-api:3.3.0-SNAPSHOT') {
+        transitive = false
+    }
+    compileOnly 'net.kyori:adventure-api:4.17.0'
+    compileOnly 'javax.inject:javax.inject:1'
+    compileOnly 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'redis.clients:jedis:4.4.8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release.set(17)
+}
+
+processResources {
+    def props = [version: project.version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('velocity-plugin.json') {
+        expand props
+    }
+}
+
+shadowJar {
+    archiveBaseName.set('ZAntiCheat-Velocity')
+    archiveClassifier.set('')
+    relocate('redis.clients', 'cn.jeyor1337.zanticheat.velocity.libs.redis')
+    relocate('org.apache.commons.pool2', 'cn.jeyor1337.zanticheat.velocity.libs.pool2')
+}
+
+tasks.build {
+    dependsOn shadowJar
+}

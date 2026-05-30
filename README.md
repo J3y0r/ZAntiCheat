@@ -12,6 +12,7 @@ ZAntiCheat 是一个面向 Bukkit / Spigot / Paper / Folia 服务端的轻量级
 - 覆盖移动、战斗、交互、数据包、背包、玩家行为等多类检测
 - 支持配置化启用、禁用、阈值、回退与处罚命令
 - 支持 Discord Webhook、数据库与 Redis 消息桥相关能力
+- 支持独立 Velocity 代理端同步封禁执行插件
 - 提供公开 API，便于其他插件临时关闭检测或监听违规 / 处罚事件
 
 ## 支持的检测类型
@@ -88,6 +89,12 @@ ZAntiCheat 是一个面向 Bukkit / Spigot / Paper / Folia 服务端的轻量级
 ./gradlew shadowJar
 ```
 
+Velocity 代理端同步插件可单独构建：
+
+```bash
+./gradlew :velocity:shadowJar
+```
+
 默认输出目录由 `gradle.properties` 中的 `destinationPath` 控制，默认值为：
 
 ```properties
@@ -95,6 +102,26 @@ destinationPath = build/libs/
 ```
 
 如果需要直接部署到本地测试服，可以把该路径改为服务器的 `plugins/` 目录。
+
+## Velocity 端同步封禁
+
+仓库包含一个独立 Velocity 插件子项目：`velocity`。它用于订阅 Bukkit / Paper 子服发出的 Redis 封禁消息，并在 Velocity 代理端执行子服配置中的原始处罚指令。
+
+部署方式：
+
+1. 子服继续安装 Bukkit / Paper 版 `ZAntiCheat`。
+2. Velocity 代理端安装 `velocity/build/libs/ZAntiCheat-Velocity-<version>.jar`。
+3. 子服 `config.yml` 中开启 `velocity-support.enabled`，设置 `main-server: false`，推荐 `sync-mode: "publish_only"`，并让所有子服连接同一个 Redis 频道。
+4. Velocity 插件首次启动后会生成 `plugins/zanticheat-velocity/config.properties`，在其中配置 Redis。
+
+子服检测项中配置的封禁命令会被替换占位符后发送到 Velocity，例如：
+
+```yaml
+commands:
+  - "ban %name% fly"
+```
+
+Velocity 端 `config.properties` 中的 `command=` 只作为兼容旧格式同步消息的兜底命令，不会覆盖新格式消息携带的子服原始处罚指令。
 
 ## 发布到 GitHub Packages
 

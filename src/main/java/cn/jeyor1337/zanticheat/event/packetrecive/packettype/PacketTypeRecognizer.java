@@ -227,7 +227,7 @@ public class PacketTypeRecognizer {
         return "ATTACK".equals(name) || "INTERACT".equals(name) || "INTERACT_AT".equals(name);
     }
 
-    private static String getPacketClassName(Object nmsPacket) {
+    public static String getPacketClassName(Object nmsPacket) {
         String className = nmsPacket.getClass().getName();
         return className.split("\\.")[className.split("\\.").length - 1].split("\\$")[0];
     }

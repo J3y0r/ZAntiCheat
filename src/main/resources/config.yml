@@ -480,7 +480,7 @@ checks:
           punishment-vio: 45
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 非法空中跳跃 360d"
+            - "ban xinghan1 非法空中跳跃 360d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -511,7 +511,7 @@ checks:
           punishment-vio: 30
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 移动速度异常 30d"
+            - "ban xinghan1 移动速度异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -540,7 +540,7 @@ checks:
           punishment-vio: 35
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 移动速度异常 30d"
+            - "ban xinghan1 移动速度异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -569,7 +569,7 @@ checks:
           punishment-vio: 40
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 移动速度异常 30d"
+            - "ban xinghan1 移动速度异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -598,7 +598,7 @@ checks:
           punishment-vio: 30
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 移动速度异常 30d"
+            - "ban xinghan1 移动速度异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -627,7 +627,7 @@ checks:
           punishment-vio: 30
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 移动速度异常 30d"
+            - "ban xinghan1 移动速度异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -656,7 +656,7 @@ checks:
           punishment-vio: 50
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 移动速度异常 30d"
+            - "ban xinghan1 移动速度异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -687,7 +687,7 @@ checks:
           punishment-vio: 20
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 摔落异常 30d"
+            - "ban xinghan1 摔落异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -716,7 +716,7 @@ checks:
           punishment-vio: 25
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 摔落异常 30d"
+            - "ban xinghan1 摔落异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -747,7 +747,7 @@ checks:
           punishment-vio: 20
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 跳跃异常 30d"
+            - "ban xinghan1 跳跃异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -776,7 +776,7 @@ checks:
           punishment-vio: 20
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 跳跃异常 30d"
+            - "ban xinghan1 跳跃异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -807,7 +807,7 @@ checks:
           punishment-vio: 40
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 非法水面行走 360d"
+            - "ban xinghan1 非法水面行走 360d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -836,7 +836,7 @@ checks:
           punishment-vio: 40
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 非法水面行走 360d"
+            - "ban xinghan1 非法水面行走 360d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -867,7 +867,7 @@ checks:
           punishment-vio: 25
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 攀爬速度异常 30d"
+            - "ban xinghan1 攀爬速度异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -898,7 +898,7 @@ checks:
           punishment-vio: 25
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 减速绕过 30d"
+            - "ban xinghan1 减速绕过 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -929,7 +929,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 自动上台阶 7d"
+            - "ban xinghan1 自动上台阶 7d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -960,7 +960,7 @@ checks:
           punishment-vio: 35
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 坐船飞天、坐船超速 360d"
+            - "ban xinghan1 坐船飞天、坐船超速 360d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1729,7 +1729,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 空中放置方块 30d"
+            - "ban xinghan1 空中放置方块 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1760,7 +1760,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 快速放置方块 30d"
+            - "ban xinghan1 快速放置方块 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1791,7 +1791,7 @@ checks:
           punishment-vio: 10
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 放置方块异常 30d"
+            - "ban xinghan1 放置方块异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1820,7 +1820,7 @@ checks:
           punishment-vio: 5
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 放置方块异常 30d"
+            - "ban xinghan1 放置方块异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1851,7 +1851,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 幽灵破坏方块 30d"
+            - "ban xinghan1 幽灵破坏方块 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1882,7 +1882,7 @@ checks:
           punishment-vio: 15
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 快速破坏方块异常 30d"
+            - "ban xinghan1 快速破坏方块异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1913,7 +1913,7 @@ checks:
           punishment-vio: 10
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 方块破坏异常 30d"
+            - "ban xinghan1 方块破坏异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1942,7 +1942,7 @@ checks:
           punishment-vio: 5
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 方块破坏异常 30d"
+            - "ban xinghan1 方块破坏异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -1973,7 +1973,7 @@ checks:
           punishment-vio: 10
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 搭路异常 30d"
+            - "ban xinghan1 搭路异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2002,7 +2002,7 @@ checks:
           punishment-vio: 10
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 搭路异常 30d"
+            - "ban xinghan1 搭路异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2036,7 +2036,7 @@ checks:
           punishment-vio: 2
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 发送数据包异常 7d"
+            - "ban xinghan1 发送数据包异常 7d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2065,7 +2065,7 @@ checks:
           punishment-vio: 2
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 发送数据包异常 7d"
+            - "ban xinghan1 发送数据包异常 7d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2096,7 +2096,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% timer"
+            - "ban xinghan1 timer"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2125,7 +2125,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% timer"
+            - "ban xinghan1 timer"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2156,7 +2156,7 @@ checks:
           punishment-vio: 5
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 数据包异常 30d"
+            - "ban xinghan1 数据包异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2185,7 +2185,7 @@ checks:
           punishment-vio: 20
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 数据包异常 30d"
+            - "ban xinghan1 数据包异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2214,7 +2214,7 @@ checks:
           punishment-vio: 15
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 数据包异常 30d"
+            - "ban xinghan1 数据包异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2243,7 +2243,7 @@ checks:
           punishment-vio: 10
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 数据包异常 30d"
+            - "ban xinghan1 数据包异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2272,7 +2272,7 @@ checks:
           punishment-vio: 8
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 数据包异常 30d"
+            - "ban xinghan1 数据包异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2301,7 +2301,7 @@ checks:
           punishment-vio: 5
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 数据包异常 30d"
+            - "ban xinghan1 数据包异常 30d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2335,7 +2335,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 非法使用背包自动整理 3d"
+            - "ban xinghan1 非法使用背包自动整理 3d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2366,7 +2366,7 @@ checks:
           punishment-vio: 4
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 物品切换异常 3d"
+            - "ban xinghan1 物品切换异常 3d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2400,7 +2400,7 @@ checks:
           punishment-vio: 3
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 自动行为 3d"
+            - "ban xinghan1 自动行为 3d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。
@@ -2431,7 +2431,7 @@ checks:
           punishment-vio: 2
           # 达到处罚阈值后依次执行的控制台命令列表。
           commands:
-            - "ban %name% 皮肤层闪烁 3d"
+            - "ban xinghan1 皮肤层闪烁 3d"
         # 该检测项的回退/取消动作配置。
         setback:
           # 是否在触发违规后执行回退、冻结或取消动作。

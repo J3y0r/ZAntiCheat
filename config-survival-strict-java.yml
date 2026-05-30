@@ -1,0 +1,2453 @@
+# ZAntiCheat Java-only strict survival profile.
+# Generated from src/main/resources/config.yml after reviewing check implementations.
+# Intended for long-running survival servers; verify manually on your target server version before replacing config.yml.
+# 是否启用该功能或检测项。
+enabled: true
+# 是否启用静默模式；启用后通常只记录或处理，不主动打扰玩家。
+silent-mode: false
+
+## Customizable plugin messages
+# 插件消息配置。
+messages:
+  # 消息前缀，支持颜色代码和全局占位符。
+  prefix: "&8(&#FF450EZAC&8)&f"
+  # Hex colors are supported since MC 1.16. Example: &#FF450E
+  # In MC 1.13-1.15, the hex colors are replaced with the nearest Bukkit colors
+  # 是否解析 &#RRGGBB 格式的十六进制颜色。
+  hex-color-codes: true
+  # A local placeholder is a placeholder that can only be used in the following message
+  # All the global placeholder can be found below
+  # 命令执行成功或信息查询时返回的消息。
+  command-messages:
+    help:
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% ZAntiCheat %version% is running"
+    reload:
+      # Local placeholders: %time%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% Successfully reloaded the config &7(%time%ms)"
+    # 游戏内告警相关配置。
+    alerts:
+      # 开启该状态时显示的消息。
+      toggled-on-message: "%prefix% Alerts are enabled!"
+      # 关闭该状态时显示的消息。
+      toggled-off-message: "%prefix% Alerts are disabled!"
+    tps:
+      # Local placeholders: %tps%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% TPS from the last 30 seconds: &f%tps%"
+    ping:
+      # Local placeholders: %ping%, %connection-stability%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% %name%&7's ping is &f%ping% &7(&f%connection-stability%&7 stability)"
+      # 连接稳定性文案分级。
+      connection-stability:
+        # 高连接稳定性时显示的文本。
+        high: "&ahigh&r"
+        # 中等连接稳定性时显示的文本。
+        medium: "&emedium&r"
+        # 低连接稳定性时显示的文本。
+        low: "&clow&r"
+    client:
+      # Local placeholders: %client-brand%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% %name%&7's client is &f%client-brand%"
+    cps:
+      # Local placeholders: %cps%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% %name%&7's CPS is &f%cps%"
+    # 所有反作弊检测项配置。
+    checks:
+      # Local placeholders: %checks%, %movement_checks%, %combat_checks%,
+      # %interaction_checks%, %inventory_checks%, %packet_checks%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% Checks: %checks%"
+    report:
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% %name% &7is now being monitored"
+  # 命令或权限校验失败时返回的错误消息。
+  error-messages:
+    # 缺少权限时显示的错误消息。
+    no-permission: "%prefix% You don't have enough permissions"
+    # Local placeholders: %usage%
+    # 命令格式错误时显示的用法提示。
+    invalid-format: "%prefix% Usage: &7%usage%"
+
+## In game notifications of violations or/and punishments
+# 游戏内告警相关配置。
+alerts:
+  # 玩家触发检测时的游戏内广播配置。
+  broadcast-violations:
+    # 是否启用该功能或检测项。
+    enabled: true
+    # 发送给玩家、管理员、控制台或外部服务的消息模板。
+    message: "%prefix% %name% was flagged for %check% (%vio%/%punishment-vio%)"
+    # Broadcasts violations of a player no more than 1 time in X ms
+    # 同类消息或动作的冷却时间，单位为毫秒。
+    cooldown: 1000
+    # Leave this field empty not to hover any text
+    # 鼠标悬停在聊天消息上时显示的文本；留空则不显示。
+    on-hover: "&7Check: &#FF450E%check% (%check-description%)%new-line%&7World: &#FF450E%world%%new-line%&7Cords: &#FF450E%x% %y% %z%%new-line%&7Client: &#FF450E%client-brand%"
+    # Local placeholders: %teleport-location%
+    # 点击聊天消息时执行的命令或动作；留空则不执行。
+    on-click: "/zac teleport %teleport-location%"
+  # 玩家被处罚时的游戏内广播配置。
+  broadcast-punishments:
+    # 是否启用该功能或检测项。
+    enabled: true
+    # 发送给玩家、管理员、控制台或外部服务的消息模板。
+    message: "%prefix% %name% was punished for %check%"
+    # Broadcasts punishments of a player no more than 1 time in X ms
+    # 同类消息或动作的冷却时间，单位为毫秒。
+    cooldown: 500
+    # Leave this field empty not to hover any text
+    # 鼠标悬停在聊天消息上时显示的文本；留空则不显示。
+    on-hover: "&7Check: &#FF450E%check% (%check-description%)%new-line%&7World: &#FF450E%world%%new-line%&7Cords: &#FF450E%x% %y% %z%%new-line%&7Client: &#FF450E%client-brand%"
+    # Local placeholders: %teleport-location%
+    # 点击聊天消息时执行的命令或动作；留空则不执行。
+    on-click: "/zac teleport %teleport-location%"
+
+## Log file
+# 违规和处罚日志文件配置。
+log:
+  # 是否启用该功能或检测项。
+  enabled: true
+  # 日志文件路径模板，可使用日期占位符。
+  file: "logs/%date-day%.log"
+  # Global placeholders: %prefix%, %version%, %name%, %uuid%, %ip%,
+  # %check%, %check-type%, %check-description%
+  # %vio%, %punishment-vio%, %setback-vio%,
+  # %tps%, %%edition%, %ping%, %connection-stability%,
+  # %world%, %x%, %y%, %z%, %client-brand%
+  # %date-day%, %date-hrs%, %date-min%, %date-sec%
+  # 违规事件写入日志的配置。
+  log-violations:
+    # 是否启用该功能或检测项。
+    enabled: true
+    # 发送给玩家、管理员、控制台或外部服务的消息模板。
+    message: "(%date-sec%) %name% was flagged [Check: %check% (%check-description%)] [Violations: %vio%/%punishment-vio%] [TPS: %tps%] [Ping: %ping%ms (%connection-stability% stability)] [Client: %client-brand%] [Location: %world% %x% %y% %z%]"
+    # Logs violations of a player no more than every X 1 time in X ms
+    # 同类消息或动作的冷却时间，单位为毫秒。
+    cooldown: 1000
+  # 处罚事件写入日志的配置。
+  log-punishments:
+    # 是否启用该功能或检测项。
+    enabled: true
+    # 发送给玩家、管理员、控制台或外部服务的消息模板。
+    message: "(%date-sec%) %name% was punished [Check: %check% (%check-description%)] [Violations: %vio%/%punishment-vio%] [TPS: %tps%]  [Ping: %ping%ms (%connection-stability% stability)] [Client: %client-brand%] [Location: %world% %x% %y% %z%]"
+    # Logs punishments of a player no more frequently than 1 time in X ms
+    # 同类消息或动作的冷却时间，单位为毫秒。
+    cooldown: 0
+
+## Discord notifications of violations or/and punishments
+# Discord Webhook 通知配置。
+discord-webhook:
+  # 是否启用该功能或检测项。
+  enabled: false
+  # You can create a webhook for your Discord server in
+  # Server Settings -> Integrations -> Webhooks -> New Webhook
+  # 向 Discord 发送违规通知的配置。
+  send-violations:
+    # 是否启用该功能或检测项。
+    enabled: false
+    # Discord Webhook 地址；留空则不会发送到 Discord。
+    webhook-url: ""
+    # 发送给玩家、管理员、控制台或外部服务的消息模板。
+    message: "```%name% was flagged for %check% (%check-description%) (%vio%/%punishment-vio%)```"
+    # 同类消息或动作的冷却时间，单位为毫秒。
+    cooldown: 2000
+  # 向 Discord 发送处罚通知的配置。
+  send-punishments:
+    # 是否启用该功能或检测项。
+    enabled: false
+    #This url can either be the same as the first one or different
+    # Discord Webhook 地址；留空则不会发送到 Discord。
+    webhook-url: ""
+    # 发送给玩家、管理员、控制台或外部服务的消息模板。
+    message: "```%name% was punished for %check% (%check-description%)```"
+    # 同类消息或动作的冷却时间，单位为毫秒。
+    cooldown: 0
+
+## Bypass permissions
+# 绕过权限相关配置。
+permission:
+  # 'zanticheat.bypess.flight_a' is a specific bypass permission
+  # Whether the specific bypass permissions should be enabled
+  # 是否启用按检测项划分的独立绕过权限。
+  per-check-bypass-permission: false
+  # If set to 'true', all the bypass permissions are disabled
+  # 是否禁用全部绕过权限。
+  disable-all-bypass-permissions: false
+
+## Violation reset
+# 违规计数生命周期配置。
+violation:
+  # 在线玩家违规计数定时重置配置。
+  reset:
+    # The interval in which violations are reset
+    # 在线玩家违规计数自动重置间隔，单位为秒。
+    reset-interval: 240
+  # 玩家离线后的违规计数缓存配置。
+  cache:
+    # 是否启用该功能或检测项。
+    enabled: true
+    # Saves the player's violations for X seconds after the player leaves
+    # If set to '0', the player's violation are reset when player quits
+    # 玩家离线后保留违规计数的时长，单位为秒；0 表示退出即清除。
+    cache-duration: 300
+
+## Lag conditions under which the detection should be disabled
+# 服务器或玩家处于高延迟时的检测保护配置。
+lag-protection:
+  # Stops the checks if the server doesn't respond for X ms
+  # 服务器单 tick 响应超过该毫秒数时暂停检测。
+  tick-threshold: 650
+  # Disables the checks on join for X ms
+  # 玩家加入服务器后跳过检测的时间，单位为毫秒。
+  ignore-time-on-join: 2000
+  # Disables the checks on teleportation to unloaded chunks for X ms
+  # 玩家传送到未加载区块后跳过检测的时间，单位为毫秒。
+  ignore-time-on-teleport: 1500
+  # Prevents gliding and riptiding players from entering into unloaded chunks
+  # 是否阻止滑翔或激流状态玩家进入未加载区块。
+  prevent-entering-into-unloaded-chucks: true
+  # Slightly improves accuracy in laggy conditions
+  # 是否在高延迟环境下优先降低误判而非提高检测强度。
+  prioritize-accuracy: true
+
+## Basically, there is no need to configure 'geyser-hook' selection,
+## unless the Geyser player linking is enabled and uses a local database
+# Geyser/Floodgate Bedrock 玩家识别配置。
+geyser-hook:
+  # 是否启用该功能或检测项。
+  enabled: true
+  # 通过 Floodgate API 识别 Bedrock 玩家的配置。
+  floodgate:
+    # Whether a player marked with Floodgate API 2.0+ counted as Bedrock players
+    # 是否启用该功能或检测项。
+    enabled: true
+  # 通过 UUID 前缀识别 Bedrock 玩家的配置。
+  uuid:
+    # Whether a player whose UUID starts with '000000' counted as Bedrock players
+    # 是否启用该功能或检测项。
+    enabled: true
+  # 通过玩家名前缀识别 Bedrock 玩家的配置。
+  prefix:
+    # Whether a player whose name starts with the prefix counted as Bedrock players
+    # 是否启用该功能或检测项。
+    enabled: true
+    # 用于识别 Bedrock 玩家的玩家名前缀。
+    prefix-string: "."
+
+## Database storage for punished players
+# Stores banned player UUIDs so other plugins can query them
+# This records UUIDs, not player names
+# Only punishments whose commands start with ban-related roots are stored
+# (for example: ban, tempban, ban-ip, ipban)
+# Leave this disabled unless MySQL is fully configured
+# 处罚记录数据库存储配置。
+database:
+  # 是否启用该功能或检测项。
+  enabled: false
+  # MySQL 连接配置。
+  mysql:
+    # 服务主机地址。
+    host: "127.0.0.1"
+    # 服务端口。
+    port: 3306
+    # 数据库名称或 Redis 数据库编号。
+    database: "zanticheat"
+    # 数据库用户名。
+    username: "zanticheat"
+    # 连接密码；留空表示不使用密码。
+    password: ""
+    # MySQL 高级连接参数。
+    advanced:
+      # Enable SSL and certificate verification when MySQL is not on the same trusted host/network
+      # 是否为 MySQL 连接启用 SSL。
+      ssl: false
+      # 是否为 MySQL 连接启用 Unicode 支持。
+      use-unicode: true
+      # 是否校验 MySQL 服务端证书。
+      verify-server-certificate: false
+      # MySQL 连接使用的字符编码。
+      character-encoding: "UTF-8"
+      # MySQL 连接断开后是否自动重连。
+      auto-reconnect: true
+      # MySQL 自动重连最大尝试次数。
+      max-reconnects: 3
+    # 数据库初始化配置。
+    init:
+      # 启动时是否自动创建所需数据库表。
+      create-tables: true
+
+## Velocity group punishment sync
+# Publishes ban punishments from child servers to the main server ZAC plugin
+# Leave this disabled unless the Redis bridge is fully configured
+# Velocity 多子服处罚同步配置。
+velocity-support:
+  # 是否启用该功能或检测项。
+  enabled: false
+  # 当前子服在跨服同步中的唯一标识。
+  server-id: "survival-01"
+  # 当前服务器是否作为接收并执行主处罚命令的主服。
+  main-server: false
+  # 跨服同步模式，控制发布和消费处罚消息的行为。
+  sync-mode: "publish_and_consume"
+  # 主服收到同步处罚后执行的封禁命令模板。
+  main-server-ban-command: "ban %name% Cheating detected by ZAC"
+  # 跨服消息桥配置。
+  message-bridge:
+    # 消息桥实现类型。
+    type: "redis"
+    # Redis 发布/订阅频道名。
+    channel: "zanticheat:velocity:ban"
+    # 服务主机地址。
+    host: "127.0.0.1"
+    # 服务端口。
+    port: 6379
+    # Configure authentication and restrict network exposure when Redis is not localhost-only
+    # 连接密码；留空表示不使用密码。
+    password: ""
+    # Redis 数据库编号。
+    database: 0
+    # 连接消息桥的超时时间，单位为毫秒。
+    connect-timeout-ms: 3000
+    # 发布同步消息的超时时间，单位为毫秒。
+    publish-timeout-ms: 3000
+
+## The update checker will let you know if a newer version is available
+# 新版本检查配置。
+update-checker:
+  # 是否启用该功能或检测项。
+  enabled: false
+  # 更新通知展示配置。
+  notification:
+    # 控制台更新通知配置。
+    console:
+      # 是否启用该更新通知渠道。
+      enabled: false
+      # Local placeholders: %latest-version%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% ZAntiCheat %latest-version% is available!"
+    # 管理员进服更新通知配置。
+    on-join:
+      # 是否启用该更新通知渠道。
+      enabled: false
+      # Local placeholders: %latest-version%
+      # 发送给玩家、管理员、控制台或外部服务的消息模板。
+      message: "%prefix% ZAntiCheat %latest-version% is available!"
+      # Whether 'zanticheat.alerts.notify' permission should be required
+      # 是否要求玩家拥有通知权限才显示该消息。
+      require-permission: true
+
+# BStats is an anonymous way of getting the average metrics of the servers
+# running the plugin. Check out ZAntiCheat's page on 'bstats.org'
+# bStats 匿名统计配置。
+bstats:
+  # The plugin is completely free, and it's always nice to know that
+  # it's useful for someone. If you care, don't disable the metrics
+  # 是否启用该功能或检测项。
+  enabled: true
+
+## It's not recommended to disable the API unless it causes any issues
+# 开发者 API 开关配置。
+api:
+  # Whether the developer API is enabled
+  # The API may be used be other plugins
+  # 是否启用该功能或检测项。
+  enabled: true
+
+# 所有反作弊检测项配置。
+checks:
+  # Movement checks
+  # 移动类检测配置。
+  movement:
+    # 飞行检测组。
+    flight:
+      # flight_a 子检测项配置。
+      flight_a:
+        # Whether this check is enabled
+        # 是否启用该功能或检测项。
+        enabled: true
+        # The punishment commands
+        # 该检测项的处罚配置。
+        punishment:
+          # Should the punishment commands be executed
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # After X violations, the punishment commands are run
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 28
+          # The commands
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # The setback feature
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # If set to 'true', the player will be frozen on getting a violation
+          # Notes: It's NOT recommended to use the setback because
+          # 1. It will notify the hackers making the checks easier to bypass
+          # 2. Using a punishment command is simply more efficient
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # After X violations, the player's actions should be cancelled
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 8
+        # Exempts from flight_a check if the conditions are not satisfied
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # If the server's TPS is lower than X, this check is bypassed
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # If the player's ping is higher than X, this check is bypassed
+          # The ping can't be higher than 10,000
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # Should the Java players be checked
+          # 是否检测 Java 版玩家。
+          java: true
+          # Should the players who joined via Geyser be checked
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # flight_b 子检测项配置。
+      flight_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 32
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 10
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # flight_c 子检测项配置。
+      flight_c:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 28
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 8
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 空中跳跃检测组。
+    airjump:
+      # airjump_a 子检测项配置。
+      airjump_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 35
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 10
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 移动速度检测组。
+    speed:
+      # speed_a 子检测项配置。
+      speed_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 24
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 8
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # speed_b 子检测项配置。
+      speed_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 28
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 10
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # speed_c 子检测项配置。
+      speed_c:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 32
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 12
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # speed_d 子检测项配置。
+      speed_d:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 26
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 10
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # speed_e 子检测项配置。
+      speed_e:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 18
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # speed_f 子检测项配置。
+      speed_f:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 60
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 26
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 无摔落检测组。
+    nofall:
+      # nofall_a 子检测项配置。
+      nofall_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 25
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 17
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # nofall_b 子检测项配置。
+      nofall_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 30
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 22
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 跳跃异常检测组。
+    jump:
+      # jump_a 子检测项配置。
+      jump_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 25
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 10
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # jump_b 子检测项配置。
+      jump_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 30
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 12
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 水面行走检测组。
+    liquidwalk:
+      # liquidwalk_a 子检测项配置。
+      liquidwalk_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 12
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 4
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # liquidwalk_b 子检测项配置。
+      liquidwalk_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 12
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 4
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 攀爬速度检测组。
+    fastclimb:
+      # fastclimb_a 子检测项配置。
+      fastclimb_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 16
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 减速绕过检测组。
+    noslow:
+      # noslow_a 子检测项配置。
+      noslow_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 20
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 8
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 自动上台阶检测组。
+    step:
+      # step_a 子检测项配置。
+      step_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 8
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 船只移动检测组。
+    boat:
+      # boat_a 子检测项配置。
+      boat_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 14
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 5
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 载具移动检测组。
+    vehicle:
+      # vehicle_a 子检测项配置。
+      vehicle_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 16
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 鞘翅飞行检测组。
+    elytra:
+      # elytra_a 子检测项配置。
+      elytra_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 30
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 21
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # elytra_b 子检测项配置。
+      elytra_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 30
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 21
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # elytra_c 子检测项配置。
+      elytra_c:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 35
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 10
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 三叉戟激流移动检测组。
+    trident:
+      # trident_a 子检测项配置。
+      trident_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 24
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 7
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 260
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+  # Combat checks
+  # 战斗类检测配置。
+  combat:
+    # KillAura/自动瞄准攻击检测组。
+    killaura:
+      # killaura_a 子检测项配置。
+      killaura_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 4
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # killaura_b 子检测项配置。
+      killaura_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 5
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # killaura_c 子检测项配置。
+      killaura_c:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 3
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # killaura_d 子检测项配置。
+      killaura_d:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 3
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 1
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # killaura_e 子检测项配置。
+      killaura_e:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: false
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 8
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 8
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 19.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 200
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: false
+          # 战斗后保留检测上下文的时间窗口，单位为毫秒。
+          combat-window: 3500
+          # 该检测内部违规状态自然衰减所需时间，单位为毫秒。
+          decay-time: 3000
+          # 该检测连续报点之间的最小间隔，单位为毫秒。
+          flag-cooldown: 750
+          # 玩家属性变化后的宽限期，单位为毫秒。
+          attribute-grace-period: 3500
+          # 判定异常大幅水平转向的 yaw 变化阈值。
+          large-yaw-step: 28.0
+          # 判定重复转向步长时要求的最小角度差。
+          min-repeat-step: 3.5
+          # 重复转向步长比较时允许的误差。
+          repeat-step-epsilon: 0.1
+          # 判定瞄准误差偏低的阈值。
+          low-error: 1.35
+          # 判定瞄准误差极低的阈值。
+          very-low-error: 0.85
+          # 低误差判定要求的最小转向幅度。
+          turn-for-low-error: 10.0
+          # 进行 pitch 检查时使用的目标垂直偏移。
+          vertical-offset-for-pitch-check: 0.35
+          # 判定 pitch 变化过于固定时允许的误差。
+          static-pitch-epsilon: 0.2
+          # 该检测单次确认后增加的内部违规等级。
+          violation-level: 6
+          # 该检测内部违规等级上限。
+          violation-cap: 12
+          # 已确认命中偏移的放大系数，用于提高判定置信度。
+          confirmed-offset-multiplier: 1.5
+    # FakeLag/攻击延迟操控检测组。
+    fakelag:
+      # fakelag_a 子检测项配置。
+      fakelag_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 5
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 19.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 180
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: false
+          # FakeLag 检测在攻击前采集的延迟样本数量。
+          pre-samples: 8
+          # FakeLag 检测在攻击后观察的数据包数量。
+          post-window-packets: 4
+          # FakeLag 检测在攻击后观察的时间窗口，单位为毫秒。
+          post-window-time: 300
+          # 判定延迟突增所需的最小绝对增量，单位为毫秒。
+          min-spike-delta: 70
+          # 判定延迟突增所需的最小倍率。
+          min-spike-ratio: 2.2
+          # 攻击前平均延迟允许的最大波动。
+          max-pre-avg-delta: 110.0
+          # 攻击前单个延迟样本允许的最大绝对偏差。
+          max-pre-abs-dev: 30.0
+          # 触发违规前需要累计的可疑标记数量。
+          flags-required: 2
+          # 检测状态等待完整样本的超时时间，单位为毫秒。
+          ready-timeout: 1500
+          # 连接稳定性较低时是否跳过该检测。
+          ignore-low-connection-stability: true
+    # 攻击距离检测组。
+    reach:
+      # reach_a 子检测项配置。
+      reach_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # reach_b 子检测项配置。
+      reach_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 4
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 异常暴击检测组。
+    criticals:
+      # criticals_a 子检测项配置。
+      criticals_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 1
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # criticals_b 子检测项配置。
+      criticals_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 7
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 1
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 自动点击检测组。
+    autoclicker:
+      # autoclicker_a 子检测项配置。
+      autoclicker_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 4
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # autoclicker_b 子检测项配置。
+      autoclicker_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 2
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # autoclicker_c 子检测项配置。
+      autoclicker_c:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 5
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 3
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+          # AutoClicker 短期点击样本窗口大小。
+          short-window-size: 16
+          # AutoClicker 主要点击样本窗口大小。
+          main-window-size: 36
+          # AutoClicker 会话级样本窗口大小。
+          session-window-size: 6
+          # 纳入 AutoClicker 统计的最小点击间隔，单位为毫秒。
+          min-interval: 15
+          # 纳入 AutoClicker 统计的最大点击间隔，单位为毫秒。
+          max-interval: 300
+          # 启用主窗口统计前需要的最少样本数。
+          min-samples-for-main-window: 28
+          # 点击间隔分桶统计的桶大小，单位为毫秒。
+          bucket-size-ms: 2
+          # 点击间隔变异系数低于该阈值时更可疑。
+          cv-threshold: 0.12
+          # 点击间隔中位绝对偏差比例低于该阈值时更可疑。
+          mad-ratio-threshold: 0.08
+          # 点击间隔熵低于该阈值时更可疑。
+          entropy-threshold: 2.25
+          # 前三高频间隔占比高于该阈值时更可疑。
+          top3-ratio-threshold: 0.85
+          # 长间隔占比低于该阈值时更可疑。
+          long-gap-ratio-threshold: 0.035
+          # 点击与视角变化相关性低于该阈值时更可疑。
+          aim-correlation-threshold: 0.075
+          # 参与点击相关性判断所需的最小视角变化压力。
+          aim-min-rotation-pressure: 12.0
+          # 单个统计窗口判定可疑的最低分数。
+          window-score-threshold: 0.55
+          # AutoClicker 内部违规分每次命中增加值。
+          vl-add: 6
+          # AutoClicker 内部违规分每次衰减值。
+          vl-decay: 2
+          # AutoClicker 内部违规分达到该值时触发违规。
+          flag-vl: 12
+          # 该检测连续报点之间的最小间隔，单位为毫秒。
+          flag-cooldown: 2500
+          # 连接稳定性较低时是否跳过该检测。
+          ignore-low-connection-stability: true
+      # autoclicker_d 子检测项配置。
+      autoclicker_d:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 5
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 3
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+          # AutoClicker 节奏分析样本窗口大小。
+          window-size: 60
+          # 启用节奏分析前需要的最少样本数。
+          min-samples: 48
+          # 每累计多少个新样本执行一次窗口分析。
+          analysis-step: 12
+          # 纳入 AutoClicker 节奏统计的最小点击间隔，单位为毫秒。
+          min-interval: 20
+          # 纳入 AutoClicker 节奏统计的最大点击间隔，单位为毫秒。
+          max-interval: 240
+          # 可疑节奏的最大平均点击间隔，单位为毫秒。
+          max-average-interval: 175
+          # 点击间隔分桶统计的桶大小，单位为毫秒。
+          bucket-size-ms: 2
+          # 相邻点击间隔差低于该值时视为稳定间隔，单位为毫秒。
+          stable-delta: 4
+          # 点击间隔变异系数低于该阈值时更可疑。
+          cv-threshold: 0.16
+          # 点击间隔中位绝对偏差比例低于该阈值时更可疑。
+          mad-ratio-threshold: 0.11
+          # 点击间隔熵低于该阈值时更可疑。
+          entropy-threshold: 2.75
+          # 前三高频间隔占比高于该阈值时更可疑。
+          top3-ratio-threshold: 0.72
+          # 连续或隔位间隔模式占比高于该阈值时更可疑。
+          pattern-ratio-threshold: 0.42
+          # 分段平均间隔偏移低于该阈值时更可疑。
+          stable-slice-threshold: 0.045
+          # 长间隔占比低于该阈值时更可疑。
+          long-gap-ratio-threshold: 0.04
+          # 单个统计窗口判定可疑的最低分数。
+          score-threshold: 0.68
+          # 触发违规前需要累计的可疑窗口数量。
+          required-windows: 3
+          # AutoClicker 内部违规分每次命中增加值。
+          vl-add: 5
+          # AutoClicker 内部违规分每次衰减值。
+          vl-decay: 2
+          # AutoClicker 内部违规分达到该值时触发违规。
+          flag-vl: 12
+          # 该检测连续报点之间的最小间隔，单位为毫秒。
+          flag-cooldown: 3500
+          # 连接稳定性较低时是否跳过该检测。
+          ignore-low-connection-stability: true
+    # 击退异常检测组。
+    velocity:
+      # velocity_a 子检测项配置。
+      velocity_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 8
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 7
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 240
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+  # Interaction checks
+  # 交互类检测配置。
+  interaction:
+    # 空中放置方块检测组。
+    airplace:
+      # airplace_a 子检测项配置。
+      airplace_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 4
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 快速放置方块检测组。
+    fastplace:
+      # fastplace_a 子检测项配置。
+      fastplace_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 5
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 方块放置合法性检测组。
+    blockplace:
+      # blockplace_a 子检测项配置。
+      blockplace_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 8
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # blockplace_b 子检测项配置。
+      blockplace_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 3
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 幽灵破坏方块检测组。
+    ghostbreak:
+      # ghostbreak_a 子检测项配置。
+      ghostbreak_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 4
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: true
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 快速破坏方块检测组。
+    fastbreak:
+      # fastbreak_a 子检测项配置。
+      fastbreak_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 8
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 8
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 方块破坏合法性检测组。
+    blockbreak:
+      # blockbreak_a 子检测项配置。
+      blockbreak_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 8
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # blockbreak_b 子检测项配置。
+      blockbreak_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 3
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # Scaffold 搭路检测组。
+    scaffold:
+      # scaffold_a 子检测项配置。
+      scaffold_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 5
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # scaffold_b 子检测项配置。
+      scaffold_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 5
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 6
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+  # Packet checks
+  # 数据包类检测配置。
+  packet:
+    # 异常高频数据包检测组。
+    morepackets:
+      # morepackets_a 子检测项配置。
+      morepackets_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 10
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 1
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # morepackets_b 子检测项配置。
+      morepackets_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 5
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 1
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 客户端 Timer 变速检测组。
+    timer:
+      # timer_a 子检测项配置。
+      timer_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 6
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # timer_b 子检测项配置。
+      timer_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 7
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 非法或异常数据包检测组。
+    badpackets:
+      # badpackets_a 子检测项配置。
+      badpackets_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 2
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 4
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # badpackets_b 子检测项配置。
+      badpackets_b:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 2
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 19
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # badpackets_c 子检测项配置。
+      badpackets_c:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 4
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 14
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # badpackets_d 子检测项配置。
+      badpackets_d:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 2
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 9
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # badpackets_e 子检测项配置。
+      badpackets_e:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 3
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 7
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+      # badpackets_f 子检测项配置。
+      badpackets_f:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 3
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 4
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 17.5
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 450
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+  # Inventory checks
+  # 背包类检测配置。
+  inventory:
+    # 背包自动整理检测组。
+    sorting:
+      # sorting_a 子检测项配置。
+      sorting_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 10
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 异常物品切换检测组。
+    itemswap:
+      # itemswap_a 子检测项配置。
+      itemswap_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 10
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 3
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 320
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+  # Player checks
+  # 玩家行为类检测配置。
+  player:
+    # 机器人/自动行为检测组。
+    autobot:
+      # autobot_a 子检测项配置。
+      autobot_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 15
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 2
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 300
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true
+    # 皮肤层闪烁检测组。
+    skinblinker:
+      # skinblinker_a 子检测项配置。
+      skinblinker_a:
+        # 是否启用该功能或检测项。
+        enabled: true
+        # 该检测项的处罚配置。
+        punishment:
+          # 是否在达到处罚阈值后执行处罚命令。
+          punishable: true
+          # 触发处罚命令所需的违规次数阈值。
+          punishment-vio: 10
+          # 达到处罚阈值后依次执行的控制台命令列表。
+          commands:
+            - "kick %name% Cheating detected (%check%)"
+        # 该检测项的回退/取消动作配置。
+        setback:
+          # 是否在触发违规后执行回退、冻结或取消动作。
+          setback: false
+          # 触发回退或取消动作所需的违规次数阈值。
+          setback-vio: 1
+        # 该检测项的触发条件和算法阈值配置。
+        detection:
+          # 服务器 TPS 低于该值时跳过该检测。
+          min-tps: 18.0
+          # 玩家延迟高于该值时跳过该检测，单位为毫秒。
+          max-ping: 300
+          # 是否检测 Java 版玩家。
+          java: true
+          # 是否检测通过 Geyser/Floodgate 加入的 Bedrock 玩家。
+          bedrock: true

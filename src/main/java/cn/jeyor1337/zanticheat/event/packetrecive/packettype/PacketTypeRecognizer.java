@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 
 public class PacketTypeRecognizer {
 
+    private static final float INVALID_ROTATION = Float.NaN;
+
     public static PacketType getPacketType(Object nmsPacket) {
         String className = getPacketClassName(nmsPacket);
         switch (className) {
@@ -88,6 +90,88 @@ public class PacketTypeRecognizer {
         return "ATTACK".equals(String.valueOf(action));
     }
 
+    public static float getYaw(Object nmsPacket) {
+        return getRotation(nmsPacket, true);
+    }
+
+    public static float getPitch(Object nmsPacket) {
+        return getRotation(nmsPacket, false);
+    }
+
+    private static float getRotation(Object nmsPacket, boolean yaw) {
+        if (getPacketType(nmsPacket) != PacketType.FLYING)
+            return INVALID_ROTATION;
+
+        String className = getRawPacketClassName(nmsPacket);
+        boolean hasRotation = className.contains("Look") || className.contains("Rot");
+        if (!hasRotation)
+            return INVALID_ROTATION;
+
+        Float value = getRotationFromMethods(nmsPacket, yaw);
+        if (value != null)
+            return value;
+
+        return getRotationFromFields(nmsPacket, yaw);
+    }
+
+    private static Float getRotationFromMethods(Object nmsPacket, boolean yaw) {
+        String expected = yaw ? "yaw" : "pitch";
+        for (Method method : nmsPacket.getClass().getDeclaredMethods()) {
+            if (method.getParameterCount() != 0)
+                continue;
+            if (method.getReturnType() != float.class && method.getReturnType() != Float.class)
+                continue;
+            if (!method.getName().toLowerCase().contains(expected))
+                continue;
+            boolean accessible = method.isAccessible();
+            if (!accessible) {
+                method.setAccessible(true);
+            }
+            try {
+                Object value = method.invoke(nmsPacket);
+                if (value instanceof Float) {
+                    if (!accessible) {
+                        method.setAccessible(false);
+                    }
+                    return (Float) value;
+                }
+            } catch (ReflectiveOperationException ignored) {
+            }
+            if (!accessible) {
+                method.setAccessible(false);
+            }
+        }
+        return null;
+    }
+
+    private static float getRotationFromFields(Object nmsPacket, boolean yaw) {
+        Field[] fields = nmsPacket.getClass().getDeclaredFields();
+        int floatIndex = 0;
+        for (Field field : fields) {
+            if (field.getType() != float.class && field.getType() != Float.class)
+                continue;
+            boolean accessible = field.isAccessible();
+            if (!accessible) {
+                field.setAccessible(true);
+            }
+            try {
+                Object value = field.get(nmsPacket);
+                if (value instanceof Float && floatIndex == (yaw ? 0 : 1)) {
+                    if (!accessible) {
+                        field.setAccessible(false);
+                    }
+                    return (Float) value;
+                }
+                floatIndex++;
+            } catch (IllegalAccessException ignored) {
+            }
+            if (!accessible) {
+                field.setAccessible(false);
+            }
+        }
+        return INVALID_ROTATION;
+    }
+
     private static Object getUseEntityAction(Object nmsPacket) {
         for (Method method : nmsPacket.getClass().getDeclaredMethods()) {
             if (method.getParameterCount() != 0)
@@ -146,6 +230,11 @@ public class PacketTypeRecognizer {
     private static String getPacketClassName(Object nmsPacket) {
         String className = nmsPacket.getClass().getName();
         return className.split("\\.")[className.split("\\.").length - 1].split("\\$")[0];
+    }
+
+    private static String getRawPacketClassName(Object nmsPacket) {
+        String className = nmsPacket.getClass().getName();
+        return className.substring(className.lastIndexOf('.') + 1);
     }
 
 }

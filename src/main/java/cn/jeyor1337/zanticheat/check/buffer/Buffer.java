@@ -58,18 +58,23 @@ public class Buffer {
 
     private PlayerBuffer getPlayerBuffer() {
         Map<UUID, PlayerBuffer> checkBuffer = getCheckBuffer();
+        if (async || checkBuffer instanceof ConcurrentHashMap)
+            return ((ConcurrentHashMap<UUID, PlayerBuffer>) checkBuffer).computeIfAbsent(uuid, ignored -> new PlayerBuffer(async));
         if (checkBuffer.containsKey(uuid))
             return checkBuffer.get(uuid);
-        PlayerBuffer playerBuffer = new PlayerBuffer(async);
+        PlayerBuffer playerBuffer = new PlayerBuffer(false);
         checkBuffer.put(uuid, playerBuffer);
         return playerBuffer;
     }
 
     private Map<UUID, PlayerBuffer> getCheckBuffer() {
         Map<CheckName, Map<UUID, PlayerBuffer>> buffers = !async ? BUFFERS : ASYNC_BUFFERS;
+        if (async || buffers instanceof ConcurrentHashMap)
+            return ((ConcurrentHashMap<CheckName, Map<UUID, PlayerBuffer>>) buffers)
+                    .computeIfAbsent(checkName, ignored -> new ConcurrentHashMap<>());
         if (buffers.containsKey(checkName))
             return buffers.get(checkName);
-        Map<UUID, PlayerBuffer> checkBuffer = !async ? new HashMap<>() : new ConcurrentHashMap<>();
+        Map<UUID, PlayerBuffer> checkBuffer = new HashMap<>();
         buffers.put(checkName, checkBuffer);
         return checkBuffer;
     }

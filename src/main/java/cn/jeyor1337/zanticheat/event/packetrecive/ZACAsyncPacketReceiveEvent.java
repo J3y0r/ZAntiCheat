@@ -15,6 +15,8 @@ public class ZACAsyncPacketReceiveEvent extends Event {
     private final PacketType packetType;
     private final int entityId;
     private final boolean attack;
+    private final float yaw;
+    private final float pitch;
 
     public ZACAsyncPacketReceiveEvent(Player player, ZACPlayer zacPlayer, Object nmsPacket) {
         super(!FoliaUtil.isFolia());
@@ -24,6 +26,13 @@ public class ZACAsyncPacketReceiveEvent extends Event {
         this.packetType = PacketTypeRecognizer.getPacketType(nmsPacket);
         this.entityId = PacketTypeRecognizer.getEntityId(nmsPacket);
         this.attack = PacketTypeRecognizer.isAttack(nmsPacket);
+        if (this.packetType == PacketType.FLYING) {
+            this.yaw = PacketTypeRecognizer.getYaw(nmsPacket);
+            this.pitch = PacketTypeRecognizer.getPitch(nmsPacket);
+        } else {
+            this.yaw = Float.NaN;
+            this.pitch = Float.NaN;
+        }
     }
 
     public Player getPlayer() {
@@ -44,6 +53,18 @@ public class ZACAsyncPacketReceiveEvent extends Event {
 
     public boolean isAttack() {
         return attack;
+    }
+
+    public boolean hasRotation() {
+        return !Float.isNaN(yaw) && !Float.isNaN(pitch);
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
     }
 
     public HandlerList getHandlers() {

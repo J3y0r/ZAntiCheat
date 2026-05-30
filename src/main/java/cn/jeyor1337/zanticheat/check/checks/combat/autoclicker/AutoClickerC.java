@@ -11,7 +11,6 @@ import cn.jeyor1337.zanticheat.event.playerattack.ZACPlayerAttackEvent;
 import cn.jeyor1337.zanticheat.player.ZACPlayer;
 import cn.jeyor1337.zanticheat.util.player.connectionstability.ConnectionStability;
 import cn.jeyor1337.zanticheat.util.player.connectionstability.ConnectionStabilityListener;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,10 +27,14 @@ public class AutoClickerC extends CombatCheck implements Listener {
     private static final long AIM_LOOKBACK_MS = 100L;
     private static final long RECENT_COMBAT_WINDOW_MS = 3000L;
     private static final long READY_TIMEOUT_MS = 1500L;
+    private static final long WINDOW_RESET_MS = 5000L;
     private static final double SHORT_WINDOW_BONUS = 0.15;
     private static final double SESSION_WINDOW_BONUS = 0.15;
     private static final double ROTATION_WEIGHT = 0.6;
     private static final double MIN_ENTROPY = 0.0001;
+    private static final int MIN_WINDOW_SIZE = 8;
+    private static final int MIN_ANALYSIS_STEP = 6;
+    private static final int MIN_SESSION_STEP = 12;
 
     public AutoClickerC() {
         super(CheckName.AUTOCLICKER_C);
@@ -45,7 +48,7 @@ public class AutoClickerC extends CombatCheck implements Listener {
         if (event.getPacketType() == PacketType.FLYING) {
             if (!isCheckAllowed(player, zacPlayer, true))
                 return;
-            recordRotation(getBuffer(player, true), player);
+            recordRotation(getBuffer(player, true), event);
             return;
         }
 
@@ -57,10 +60,15 @@ public class AutoClickerC extends CombatCheck implements Listener {
         CheckSetting setting = getCheckSetting();
         Buffer buffer = getBuffer(player, true);
         long now = System.currentTimeMillis();
+        int mainWindowSize = getMainWindowSize(setting);
+        int shortWindowSize = getShortWindowSize(setting);
+        int minMainSamples = getMinMainSamples(setting);
+        int sessionWindowSize = getSessionWindowSize(setting);
 
         if (setting.autoClickerCIgnoreLowConnectionStability &&
                 ConnectionStabilityListener.getConnectionStability(player) == ConnectionStability.LOW) {
-            soften(buffer, now, setting, 2);
+            resetSamples(buffer);
+            soften(buffer, now, setting, setting.autoClickerCVlDecay + 1);
             return;
         }
 
@@ -75,21 +83,31 @@ public class AutoClickerC extends CombatCheck implements Listener {
         long interval = now - buffer.getLong("lastCombatClickAt");
         buffer.put("lastCombatClickAt", now);
 
-        if (interval < setting.autoClickerCMinInterval || interval > setting.autoClickerCMaxInterval) {
-            buffer.put("contamination", Math.min(setting.autoClickerCMainWindowSize, buffer.getInt("contamination") + 1));
+        long minInterval = getMinInterval(setting);
+        long maxInterval = getMaxInterval(setting);
+        if (interval < minInterval || interval > maxInterval) {
+            if (interval > maxInterval)
+                resetSamples(buffer);
+            buffer.put("contamination", Math.min(mainWindowSize, buffer.getInt("contamination") + 1));
             soften(buffer, now, setting, 1);
             return;
         }
 
         double aimPressure = collectAimPressure(buffer, now);
-        recordSample(buffer, "short", setting.autoClickerCShortWindowSize, interval, aimPressure);
-        recordSample(buffer, "main", setting.autoClickerCMainWindowSize, interval, aimPressure);
+        recordSample(buffer, "short", shortWindowSize, interval, aimPressure);
+        recordSample(buffer, "main", mainWindowSize, interval, aimPressure);
+        buffer.put("sampleSequence", buffer.getLong("sampleSequence") + 1L);
 
         int mainSize = buffer.getInt("mainSize");
-        if (mainSize < setting.autoClickerCMinSamplesForMainWindow)
+        if (mainSize < minMainSamples)
             return;
 
-        WindowStats mainStats = analyzeWindow(buffer, "main", mainSize, setting);
+        long sequence = buffer.getLong("sampleSequence");
+        if (sequence - buffer.getLong("lastAnalysisSequence") < getAnalysisStep(setting))
+            return;
+        buffer.put("lastAnalysisSequence", sequence);
+
+        WindowStats mainStats = analyzeWindow(buffer, "main", mainSize, mainWindowSize, setting);
         if (mainStats == null) {
             soften(buffer, now, setting, 1);
             return;
@@ -97,10 +115,13 @@ public class AutoClickerC extends CombatCheck implements Listener {
 
         WindowStats shortStats = null;
         int shortSize = buffer.getInt("shortSize");
-        if (shortSize >= Math.max(8, setting.autoClickerCShortWindowSize / 2))
-            shortStats = analyzeWindow(buffer, "short", shortSize, setting);
+        if (shortSize >= Math.max(MIN_WINDOW_SIZE, shortWindowSize / 2))
+            shortStats = analyzeWindow(buffer, "short", shortSize, shortWindowSize, setting);
 
-        recordSession(buffer, mainStats, setting.autoClickerCSessionWindowSize);
+        if (sequence - buffer.getLong("lastSessionSequence") >= getSessionStep(setting)) {
+            recordSession(buffer, mainStats, sessionWindowSize);
+            buffer.put("lastSessionSequence", sequence);
+        }
         SessionStats sessionStats = analyzeSession(buffer);
 
         double rawScore = scoreWindow(mainStats, setting);
@@ -112,8 +133,8 @@ public class AutoClickerC extends CombatCheck implements Listener {
         double confidence = computeConfidence(player, buffer, mainStats, setting);
         double score = rawScore * confidence;
 
-        if (score >= setting.autoClickerCWindowScoreThreshold) {
-            buffer.put("abnormalWindows", buffer.getInt("abnormalWindows") + 1);
+        if (score >= setting.autoClickerCWindowScoreThreshold && hasEnoughEvidence(mainStats, setting)) {
+            buffer.put("abnormalWindows", Math.min(4, buffer.getInt("abnormalWindows") + 1));
             buffer.put("vl", Math.min(setting.autoClickerCFlagVl * 2, buffer.getInt("vl") + setting.autoClickerCVlAdd));
             buffer.put("lastWindowAt", now);
         } else {
@@ -160,20 +181,24 @@ public class AutoClickerC extends CombatCheck implements Listener {
         callViolationEvent(player, zacPlayer, event.getEvent());
     }
 
-    private static void recordRotation(Buffer buffer, Player player) {
-        Location current = player.getLocation();
-        if (!buffer.isExists("lastRotationLocation")) {
-            buffer.put("lastRotationLocation", current.clone());
+    private static void recordRotation(Buffer buffer, ZACAsyncPacketReceiveEvent event) {
+        if (!event.hasRotation())
+            return;
+
+        float yaw = event.getYaw();
+        float pitch = event.getPitch();
+        if (!buffer.isExists("lastRotationYaw") || !buffer.isExists("lastRotationPitch")) {
+            buffer.put("lastRotationYaw", yaw);
+            buffer.put("lastRotationPitch", pitch);
             return;
         }
 
-        Location previous = buffer.getLocation("lastRotationLocation");
-        buffer.put("lastRotationLocation", current.clone());
-        if (previous == null)
-            return;
-
-        double yawDelta = Math.abs(getAngleDelta(previous.getYaw(), current.getYaw()));
-        double pitchDelta = Math.abs(current.getPitch() - previous.getPitch());
+        float previousYaw = buffer.getFloat("lastRotationYaw");
+        float previousPitch = buffer.getFloat("lastRotationPitch");
+        buffer.put("lastRotationYaw", yaw);
+        buffer.put("lastRotationPitch", pitch);
+        double yawDelta = Math.abs(getAngleDelta(previousYaw, yaw));
+        double pitchDelta = Math.abs(pitch - previousPitch);
         double pressure = yawDelta + pitchDelta * ROTATION_WEIGHT;
         long now = System.currentTimeMillis();
 
@@ -200,22 +225,25 @@ public class AutoClickerC extends CombatCheck implements Listener {
     }
 
     private static void recordSample(Buffer buffer, String prefix, int limit, long interval, double aimPressure) {
-        int index = buffer.getInt(prefix + "Index");
+        int index = buffer.getInt(prefix + "Index") % limit;
         buffer.put(prefix + "Interval_" + index, interval);
         buffer.put(prefix + "Aim_" + index, aimPressure);
         buffer.put(prefix + "Index", (index + 1) % limit);
         buffer.put(prefix + "Size", Math.min(buffer.getInt(prefix + "Size") + 1, limit));
     }
 
-    private static WindowStats analyzeWindow(Buffer buffer, String prefix, int size, CheckSetting setting) {
+    private static WindowStats analyzeWindow(Buffer buffer, String prefix, int size, int limit, CheckSetting setting) {
         List<Long> intervals = new ArrayList<>(size);
         List<Double> aimPressures = new ArrayList<>(size);
+        int index = buffer.getInt(prefix + "Index") % limit;
+        int start = (index - size + limit) % limit;
         for (int i = 0; i < size; i++) {
-            long interval = buffer.getLong(prefix + "Interval_" + i);
+            int sampleIndex = (start + i) % limit;
+            long interval = buffer.getLong(prefix + "Interval_" + sampleIndex);
             if (interval <= 0L)
                 continue;
             intervals.add(interval);
-            aimPressures.add(buffer.getDouble(prefix + "Aim_" + i));
+            aimPressures.add(buffer.getDouble(prefix + "Aim_" + sampleIndex));
         }
 
         if (intervals.size() < 8)
@@ -236,9 +264,10 @@ public class AutoClickerC extends CombatCheck implements Listener {
         double mad = getMedianAbsoluteDeviation(intervalDoubles, median);
         double cv = std / mean;
         double madRatio = mad / median;
-        double entropy = getEntropy(intervals, setting.autoClickerCBucketSizeMs);
-        double top3Ratio = getTop3Ratio(intervals, setting.autoClickerCBucketSizeMs);
-        double longGapRatio = getLongGapRatio(intervals, median + (2.0 * mad));
+        long bucketSize = getBucketSize(setting);
+        double entropy = getEntropy(intervals, bucketSize);
+        double top3Ratio = getTop3Ratio(intervals, bucketSize);
+        double longGapRatio = getLongGapRatio(intervals, median + Math.max(12.0, 3.0 * mad));
         double aimCorrelation = getPearsonCorrelation(intervals, aimPressures, setting.autoClickerCAimMinRotationPressure);
         int activeAimSamples = getActiveAimSamples(aimPressures, setting.autoClickerCAimMinRotationPressure);
 
@@ -246,7 +275,7 @@ public class AutoClickerC extends CombatCheck implements Listener {
     }
 
     private static void recordSession(Buffer buffer, WindowStats stats, int limit) {
-        int index = buffer.getInt("sessionIndex");
+        int index = buffer.getInt("sessionIndex") % limit;
         buffer.put("sessionMean_" + index, stats.mean);
         buffer.put("sessionCv_" + index, stats.cv);
         buffer.put("sessionIndex", (index + 1) % limit);
@@ -295,6 +324,29 @@ public class AutoClickerC extends CombatCheck implements Listener {
         return score;
     }
 
+    private static boolean hasEnoughEvidence(WindowStats stats, CheckSetting setting) {
+        boolean regularity = stats.cv <= setting.autoClickerCCvThreshold &&
+                stats.madRatio <= setting.autoClickerCMadRatioThreshold;
+        boolean distribution = stats.entropy <= setting.autoClickerCEntropyThreshold ||
+                stats.top3Ratio >= setting.autoClickerCTop3RatioThreshold;
+        boolean sustained = stats.longGapRatio <= setting.autoClickerCLongGapRatioThreshold;
+        boolean aim = !Double.isNaN(stats.aimCorrelation) &&
+                stats.activeAimSamples >= Math.max(6, stats.sampleSize / 5) &&
+                Math.abs(stats.aimCorrelation) <= setting.autoClickerCAimCorrelationThreshold;
+
+        int families = 0;
+        if (regularity)
+            families++;
+        if (distribution)
+            families++;
+        if (sustained)
+            families++;
+        if (aim)
+            families++;
+
+        return families >= 3;
+    }
+
     private static double computeConfidence(Player player, Buffer buffer, WindowStats stats, CheckSetting setting) {
         double confidence = 1.0;
         ConnectionStability stability = ConnectionStabilityListener.getConnectionStability(player);
@@ -306,9 +358,9 @@ public class AutoClickerC extends CombatCheck implements Listener {
         if (stats.activeAimSamples < Math.max(6, stats.sampleSize / 5))
             confidence *= 0.85;
 
-        int contamination = Math.min(buffer.getInt("contamination"), setting.autoClickerCMainWindowSize);
+        int contamination = Math.min(buffer.getInt("contamination"), getMainWindowSize(setting));
         if (contamination > 0) {
-            double contaminationRatio = contamination / (double) Math.max(1, setting.autoClickerCMainWindowSize);
+            double contaminationRatio = contamination / (double) getMainWindowSize(setting);
             confidence *= Math.max(0.55, 1.0 - contaminationRatio);
             buffer.put("contamination", Math.max(0, contamination - 1));
         }
@@ -317,11 +369,59 @@ public class AutoClickerC extends CombatCheck implements Listener {
     }
 
     private static void soften(Buffer buffer, long now, CheckSetting setting, int decay) {
-        if (now - buffer.getLong("lastWindowAt") > 4000L)
+        if (now - buffer.getLong("lastWindowAt") > WINDOW_RESET_MS)
             buffer.put("abnormalWindows", 0);
         buffer.put("vl", Math.max(0, buffer.getInt("vl") - decay));
         if (decay >= setting.autoClickerCVlDecay)
             buffer.put("abnormalWindows", Math.max(0, buffer.getInt("abnormalWindows") - 1));
+    }
+
+    private static void resetSamples(Buffer buffer) {
+        buffer.put("shortSize", 0);
+        buffer.put("shortIndex", 0);
+        buffer.put("mainSize", 0);
+        buffer.put("mainIndex", 0);
+        buffer.put("sessionSize", 0);
+        buffer.put("sessionIndex", 0);
+        buffer.put("sampleSequence", 0L);
+        buffer.put("lastAnalysisSequence", 0L);
+        buffer.put("lastSessionSequence", 0L);
+    }
+
+    private static int getShortWindowSize(CheckSetting setting) {
+        return Math.max(MIN_WINDOW_SIZE, setting.autoClickerCShortWindowSize);
+    }
+
+    private static int getMainWindowSize(CheckSetting setting) {
+        return Math.max(MIN_WINDOW_SIZE, setting.autoClickerCMainWindowSize);
+    }
+
+    private static int getSessionWindowSize(CheckSetting setting) {
+        return Math.max(4, setting.autoClickerCSessionWindowSize);
+    }
+
+    private static int getMinMainSamples(CheckSetting setting) {
+        return Math.max(MIN_WINDOW_SIZE, Math.min(setting.autoClickerCMinSamplesForMainWindow, getMainWindowSize(setting)));
+    }
+
+    private static int getAnalysisStep(CheckSetting setting) {
+        return Math.max(MIN_ANALYSIS_STEP, getMainWindowSize(setting) / 3);
+    }
+
+    private static int getSessionStep(CheckSetting setting) {
+        return Math.max(MIN_SESSION_STEP, getMainWindowSize(setting) / 2);
+    }
+
+    private static long getBucketSize(CheckSetting setting) {
+        return Math.max(1L, setting.autoClickerCBucketSizeMs);
+    }
+
+    private static long getMinInterval(CheckSetting setting) {
+        return Math.max(1L, setting.autoClickerCMinInterval);
+    }
+
+    private static long getMaxInterval(CheckSetting setting) {
+        return Math.max(getMinInterval(setting), setting.autoClickerCMaxInterval);
     }
 
     private static double getMedian(List<Double> values) {

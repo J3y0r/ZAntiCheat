@@ -64,24 +64,18 @@ public class MySqlBanRecordService {
         if (commands == null)
             return false;
         for (String command : commands) {
-            if (isBanCommand(command))
-                return true;
-        }
-        return false;
-    }
-
-    public static boolean isBanCommand(String command) {
-        if (command == null)
-            return false;
-        String normalized = command.trim();
-        if (normalized.startsWith("/"))
-            normalized = normalized.substring(1);
-        int separator = normalized.indexOf(' ');
-        String root = separator == -1 ? normalized : normalized.substring(0, separator);
-        root = root.toLowerCase(Locale.ROOT);
-        for (String prefix : BAN_COMMAND_PREFIXES) {
-            if (root.equals(prefix))
-                return true;
+            if (command == null)
+                continue;
+            String normalized = command.trim();
+            if (normalized.startsWith("/"))
+                normalized = normalized.substring(1);
+            int separator = normalized.indexOf(' ');
+            String root = separator == -1 ? normalized : normalized.substring(0, separator);
+            root = root.toLowerCase(Locale.ROOT);
+            for (String prefix : BAN_COMMAND_PREFIXES) {
+                if (root.equals(prefix))
+                    return true;
+            }
         }
         return false;
     }

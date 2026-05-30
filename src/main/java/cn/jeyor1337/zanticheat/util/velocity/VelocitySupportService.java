@@ -51,10 +51,6 @@ public class VelocitySupportService {
     }
 
     public boolean publishBan(String playerName, UUID uuid, CheckSetting checkSetting) {
-        return publishBan(playerName, uuid, checkSetting, "");
-    }
-
-    public boolean publishBan(String playerName, UUID uuid, CheckSetting checkSetting, String command) {
         if (!enabled || messageBridge == null || syncMode == VelocitySyncMode.NONE)
             return false;
         VelocityBanSyncMessage message = new VelocityBanSyncMessage(
@@ -62,14 +58,9 @@ public class VelocitySupportService {
                 playerName,
                 uuid != null ? uuid.toString() : "",
                 checkSetting.name.title,
-                command,
                 System.currentTimeMillis()
         );
         return messageBridge.publish(message);
-    }
-
-    public boolean isEnabled() {
-        return enabled && messageBridge != null && syncMode != VelocitySyncMode.NONE;
     }
 
     private void handleIncomingMessage(VelocityBanSyncMessage message) {

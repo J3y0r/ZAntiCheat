@@ -4,7 +4,6 @@ import cn.jeyor1337.zanticheat.Main;
 import cn.jeyor1337.zanticheat.api.event.LACPunishmentEvent;
 import cn.jeyor1337.zanticheat.storage.mysql.MySqlBanRecordService;
 import cn.jeyor1337.zanticheat.util.config.ConfigManager;
-import cn.jeyor1337.zanticheat.util.config.placeholder.PlaceholderConvertor;
 import cn.jeyor1337.zanticheat.util.logger.LogType;
 import cn.jeyor1337.zanticheat.util.logger.Logger;
 import cn.jeyor1337.zanticheat.util.scheduler.Scheduler;
@@ -28,24 +27,19 @@ public class BanRecordPersistenceListener implements Listener {
         if (!MySqlBanRecordService.shouldStorePunishment(event.getCheckSettings().punishmentCommands))
             return;
         Scheduler.runTaskAsynchronously(false, () -> {
-            if (ConfigManager.Config.Database.enabled && mySqlBanRecordService != null) {
-                mySqlBanRecordService.saveBannedPlayer(event.getPlayer().getUniqueId());
-            }
+            boolean saved = !ConfigManager.Config.Database.enabled ||
+                    mySqlBanRecordService != null && mySqlBanRecordService.saveBannedPlayer(event.getPlayer().getUniqueId());
+            if (!saved)
+                return;
             Main main = Main.getInstance();
             VelocitySupportService velocitySupportService = main.getVelocitySupportService();
             if (velocitySupportService == null)
                 return;
-            for (String command : event.getCheckSettings().punishmentCommands) {
-                if (!MySqlBanRecordService.isBanCommand(command))
-                    continue;
-                String syncedCommand = PlaceholderConvertor.colorize(PlaceholderConvertor.swapAll(command,
-                        event.getCheckSettings(), event.getPlayer(), event.getAcPlayer()), true);
-                boolean published = velocitySupportService.publishBan(event.getPlayer().getName(),
-                        event.getPlayer().getUniqueId(), event.getCheckSettings(), syncedCommand);
-                if (!published && ConfigManager.Config.VelocitySupport.enabled) {
-                    Logger.logConsole(LogType.ERROR, "(" + Main.getInstance().getName() + ") Failed to publish velocity ban sync for "
-                            + event.getPlayer().getUniqueId());
-                }
+            boolean published = velocitySupportService.publishBan(event.getPlayer().getName(),
+                    event.getPlayer().getUniqueId(), event.getCheckSettings());
+            if (!published && ConfigManager.Config.VelocitySupport.enabled) {
+                Logger.logConsole(LogType.ERROR, "(" + Main.getInstance().getName() + ") Failed to publish velocity ban sync for "
+                        + event.getPlayer().getUniqueId());
             }
         });
     }

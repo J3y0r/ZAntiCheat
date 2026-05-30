@@ -13,7 +13,6 @@ public class ZACAsyncPacketReceiveEvent extends Event {
     private final Player player;
     private final ZACPlayer zacPlayer;
     private final PacketType packetType;
-    private final String packetClassName;
     private final int entityId;
     private final boolean attack;
     private final float yaw;
@@ -24,7 +23,6 @@ public class ZACAsyncPacketReceiveEvent extends Event {
 
         this.player = player;
         this.zacPlayer = zacPlayer;
-        this.packetClassName = PacketTypeRecognizer.getPacketClassName(nmsPacket);
         this.packetType = PacketTypeRecognizer.getPacketType(nmsPacket);
         this.entityId = PacketTypeRecognizer.getEntityId(nmsPacket);
         this.attack = PacketTypeRecognizer.isAttack(nmsPacket);
@@ -47,10 +45,6 @@ public class ZACAsyncPacketReceiveEvent extends Event {
 
     public PacketType getPacketType() {
         return packetType;
-    }
-
-    public String getPacketClassName() {
-        return packetClassName;
     }
 
     public int getEntityId() {

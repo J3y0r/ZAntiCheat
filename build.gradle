@@ -34,6 +34,8 @@ dependencies {
     implementation 'com.mchange:c3p0:0.9.5.5'
     // Redis message bridge
     implementation 'redis.clients:jedis:4.4.8'
+    // LightInjector
+    implementation files('impl/LightInjector-1.0.2-forked.jar')
     // FoliaLib
     implementation 'com.tcoded:FoliaLib:0.4.3'
     // Floodgate

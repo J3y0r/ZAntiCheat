@@ -1,6 +1,5 @@
 package cn.jeyor1337.zanticheat.util.violation;
 
-import cn.jeyor1337.zanticheat.Main;
 import cn.jeyor1337.zanticheat.api.event.LACPunishmentEvent;
 import cn.jeyor1337.zanticheat.api.event.LACViolationEvent;
 import cn.jeyor1337.zanticheat.check.CheckName;
@@ -8,7 +7,6 @@ import cn.jeyor1337.zanticheat.check.CheckSetting;
 import cn.jeyor1337.zanticheat.player.ZACPlayer;
 import cn.jeyor1337.zanticheat.player.cache.history.HistoryElement;
 import cn.jeyor1337.zanticheat.player.violation.PlayerViolations;
-import cn.jeyor1337.zanticheat.storage.mysql.MySqlBanRecordService;
 import cn.jeyor1337.zanticheat.util.async.AsyncUtil;
 import cn.jeyor1337.zanticheat.util.config.ConfigManager;
 import cn.jeyor1337.zanticheat.util.config.placeholder.PlaceholderConvertor;
@@ -17,7 +15,6 @@ import cn.jeyor1337.zanticheat.util.detection.LeanTowards;
 import cn.jeyor1337.zanticheat.util.hook.server.folia.FoliaUtil;
 import cn.jeyor1337.zanticheat.util.logger.Logger;
 import cn.jeyor1337.zanticheat.util.scheduler.Scheduler;
-import cn.jeyor1337.zanticheat.util.velocity.VelocitySupportService;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -192,7 +189,7 @@ public class ViolationHandler implements Listener {
             }
         }
 
-        if (checkSetting.punishable && !shouldRoutePunishmentToVelocity(checkSetting) &&
+        if (checkSetting.punishable &&
                 checkSetting.punishmentCommands != null && !checkSetting.punishmentCommands.isEmpty()) {
             Scheduler.runTask(false, () -> {
                 for (String command : checkSetting.punishmentCommands)
@@ -202,15 +199,6 @@ public class ViolationHandler implements Listener {
         }
 
         zacPlayer.violations = new PlayerViolations();
-    }
-
-    private static boolean shouldRoutePunishmentToVelocity(CheckSetting checkSetting) {
-        if (checkSetting.punishmentCommands == null || checkSetting.punishmentCommands.isEmpty())
-            return false;
-        if (!MySqlBanRecordService.shouldStorePunishment(checkSetting.punishmentCommands))
-            return false;
-        VelocitySupportService velocitySupportService = Main.getInstance().getVelocitySupportService();
-        return velocitySupportService != null && velocitySupportService.isEnabled();
     }
 
 }

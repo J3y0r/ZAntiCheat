@@ -20,45 +20,40 @@ public final class IntegrationModule implements PluginModule {
 
     @Override
     public void disable(PluginContext context) {
-        unregisterBanRecordPersistenceListener(context);
-        shutdownVelocitySupportSubsystem(context);
+        shutdownVelocitySupportSubsystem();
         shutdownDatabaseSubsystem(context);
     }
 
     public void reloadDatabaseSubsystem(PluginContext context) {
         shutdownDatabaseSubsystem(context);
         if (!ConfigManager.Config.Database.enabled) {
-            refreshBanRecordPersistenceListener(context);
             return;
         }
 
         mySqlBanRecordService = new MySqlBanRecordService();
         if (!mySqlBanRecordService.initialize()) {
             mySqlBanRecordService = null;
-            refreshBanRecordPersistenceListener(context);
             return;
         }
 
+        banRecordPersistenceListener = new BanRecordPersistenceListener(mySqlBanRecordService);
+        context.registerListener(banRecordPersistenceListener);
         context.putService(MySqlBanRecordService.class, mySqlBanRecordService);
-        refreshBanRecordPersistenceListener(context);
     }
 
     public void reloadVelocitySupportSubsystem(PluginContext context) {
-        shutdownVelocitySupportSubsystem(context);
+        shutdownVelocitySupportSubsystem();
         if (!ConfigManager.Config.VelocitySupport.enabled) {
-            refreshBanRecordPersistenceListener(context);
             return;
         }
 
         velocitySupportService = new VelocitySupportService();
         if (!velocitySupportService.initialize()) {
             velocitySupportService = null;
-            refreshBanRecordPersistenceListener(context);
             return;
         }
 
         context.putService(VelocitySupportService.class, velocitySupportService);
-        refreshBanRecordPersistenceListener(context);
     }
 
     public VelocitySupportService getVelocitySupportService() {
@@ -66,6 +61,10 @@ public final class IntegrationModule implements PluginModule {
     }
 
     private void shutdownDatabaseSubsystem(PluginContext context) {
+        if (banRecordPersistenceListener != null) {
+            context.unregisterListener(banRecordPersistenceListener);
+            banRecordPersistenceListener = null;
+        }
         if (mySqlBanRecordService != null) {
             mySqlBanRecordService.close();
             mySqlBanRecordService = null;
@@ -73,29 +72,11 @@ public final class IntegrationModule implements PluginModule {
         }
     }
 
-    private void shutdownVelocitySupportSubsystem(PluginContext context) {
+    private void shutdownVelocitySupportSubsystem() {
         if (velocitySupportService == null) {
             return;
         }
         velocitySupportService.shutdown();
         velocitySupportService = null;
-        context.putService(VelocitySupportService.class, null);
-    }
-
-    private void refreshBanRecordPersistenceListener(PluginContext context) {
-        unregisterBanRecordPersistenceListener(context);
-        if (mySqlBanRecordService == null && velocitySupportService == null) {
-            return;
-        }
-        banRecordPersistenceListener = new BanRecordPersistenceListener(mySqlBanRecordService);
-        context.registerListener(banRecordPersistenceListener);
-    }
-
-    private void unregisterBanRecordPersistenceListener(PluginContext context) {
-        if (banRecordPersistenceListener == null) {
-            return;
-        }
-        context.unregisterListener(banRecordPersistenceListener);
-        banRecordPersistenceListener = null;
     }
 }

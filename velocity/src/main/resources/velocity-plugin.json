@@ -1,9 +1,0 @@
-{
-  "id": "zanticheat-velocity",
-  "name": "ZAntiCheat Velocity Sync",
-  "version": "${version}",
-  "main": "cn.jeyor1337.zanticheat.velocity.ZACVelocitySyncPlugin",
-  "authors": [
-    "Jeyor1337"
-  ]
-}
